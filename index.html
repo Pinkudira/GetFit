@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutina 6 días — Diana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #17181a;
+    --panel: #201f1d;
+    --panel-2: #2a2826;
+    --line: #38352f;
+    --chalk: #ede9e0;
+    --muted: #96908a;
+    --amber: #e3a730;
+    --amber-dim: #6b5424;
+    --rust: #b0483a;
+    --rust-dim: #4a2620;
+    --green: #7c9a6f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    padding:0 0 40px 0;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px;}
+
+  /* Header */
+  .header{margin-bottom:20px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    color:var(--amber);
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:.01em;
+    margin:0;
+    text-transform:uppercase;
+  }
+
+  /* Day selector - weight plates */
+  .plates{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding:18px 2px 22px 2px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .plate{
+    flex:0 0 auto;
+    width:52px;height:52px;
+    border-radius:50%;
+    border:3px solid var(--line);
+    background:radial-gradient(circle at 35% 30%, var(--panel-2), var(--panel));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:20px;
+    color:var(--muted);
+    cursor:pointer;
+    position:relative;
+    transition:transform .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .plate.active{
+    border-color:var(--amber);
+    color:var(--amber);
+    transform:scale(1.08);
+  }
+  .plate .dot{
+    position:absolute;
+    bottom:-3px;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--green);
+    display:none;
+  }
+  .plate.logged .dot{display:block;}
+
+  /* Day panel */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px;
+  }
+  .day-title{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:19px;
+    text-transform:uppercase;
+    letter-spacing:.01em;
+    margin:0 0 2px 0;
+  }
+  .day-sub{
+    color:var(--muted);
+    font-size:13px;
+    margin:0 0 16px 0;
+  }
+
+  /* Session controls */
+  .session-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+  }
+  .btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    border:none;
+    border-radius:6px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:600;
+    transition:opacity .15s ease;
+  }
+  .btn:active{opacity:.75;}
+  .btn-start{background:var(--amber);color:#1a1508;}
+  .btn-end{background:var(--rust);color:#f5e6e2;}
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--muted);
+  }
+  .timer-live{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:18px;
+    color:var(--amber);
+    margin-left:auto;
+  }
+  .timer-idle{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--muted);
+    margin-left:auto;
+  }
+
+  /* Exercise block */
+  .exercise{margin-bottom:20px;}
+  .ex-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:8px;
+  }
+  .ex-name{font-weight:600;font-size:14.5px;}
+  .ex-target{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .sets-table{width:100%;border-collapse:collapse;}
+  .sets-table th{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    text-align:left;
+    font-weight:500;
+    padding:0 6px 6px 0;
+  }
+  .sets-table td{padding:4px 6px 4px 0;}
+  .sets-table input[type=number]{
+    width:54px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:5px;
+    color:var(--chalk);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13.5px;
+    padding:6px 6px;
+    text-align:center;
+  }
+  .sets-table input[type=number]::-webkit-inner-spin-button{opacity:0;}
+  .set-check{
+    width:26px;height:26px;
+    border-radius:50%;
+    border:1.5px solid var(--line);
+    background:transparent;
+    cursor:pointer;
+    color:var(--muted);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;
+  }
+  .set-check.done{
+    background:var(--green);
+    border-color:var(--green);
+    color:#12190f;
+  }
+  .add-set{
+    background:transparent;
+    border:1px dashed var(--line);
+    color:var(--amber);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    border-radius:6px;
+    padding:5px 10px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+
+  .notes-block{margin-top:6px;}
+  .notes-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-bottom:6px;
+    display:block;
+  }
+  textarea{
+    width:100%;
+    min-height:60px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    padding:10px;
+    resize:vertical;
+  }
+
+  /* Rest timer overlay */
+  .rest-overlay{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    background:var(--panel-2);
+    border-top:1px solid var(--amber);
+    padding:16px;
+    display:none;
+    align-items:center;
+    gap:14px;
+    max-width:640px;
+    margin:0 auto;
+  }
+  .rest-overlay.show{display:flex;}
+  .rest-time{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:26px;
+    color:var(--amber);
+    min-width:70px;
+  }
+  .rest-label{flex:1;font-size:13px;color:var(--muted);}
+  .rest-skip{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--chalk);
+    border-radius:6px;
+    padding:8px 12px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    cursor:pointer;
+  }
+
+  .history-note{
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:14px;
+    text-align:center;
+  }
+
+  /* View switch */
+  .view-switch{
+    display:flex;
+    gap:6px;
+    margin-bottom:4px;
+  }
+  .view-btn{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:9px 0;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .view-btn.active{
+    border-color:var(--amber);
+    color:var(--amber);
+    background:var(--amber-dim);
+  }
+
+  /* Weight panel */
+  .weight-form{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:18px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+  }
+  .weight-form input[type=number]{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--chalk);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:16px;
+    padding:9px 10px;
+    width:90px;
+    text-align:center;
+  }
+  .weight-form input[type=text]{
+    flex:1;
+    min-width:140px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    padding:9px 10px;
+  }
+  .weight-form .unit{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .weight-stats{
+    display:flex;
+    gap:18px;
+    margin-bottom:16px;
+  }
+  .wstat{flex:1;}
+  .wstat-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .wstat-value{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:22px;
+    color:var(--chalk);
+  }
+  .wstat-value.pos{color:var(--rust);}
+  .wstat-value.neg{color:var(--green);}
+  .chart-wrap{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 8px;
+    margin-bottom:16px;
+  }
+  .weight-log{
+    max-height:180px;
+    overflow-y:auto;
+  }
+  .weight-log-row{
+    display:flex;
+    flex-direction:column;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .wl-main{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .wl-date{color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11.5px;}
+  .wl-kg{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .wl-actions{display:flex;gap:2px;align-items:center;}
+  .wl-note{
+    color:var(--muted);
+    font-size:12.5px;
+    margin-top:3px;
+    padding-right:8px;
+  }
+  .wl-edit-form{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+    align-items:center;
+  }
+  .wl-edit-form input[type=number]{
+    width:70px;
+    background:var(--panel-2);
+    border:1px solid var(--amber);
+    border-radius:5px;
+    color:var(--chalk);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    padding:6px 8px;
+    text-align:center;
+  }
+  .wl-edit-form input[type=text]{
+    flex:1;
+    min-width:120px;
+    background:var(--panel-2);
+    border:1px solid var(--amber);
+    border-radius:5px;
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    padding:6px 8px;
+  }
+  .wl-save{
+    background:var(--amber);
+    color:#1a1508;
+    border:none;
+    border-radius:5px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:6px 10px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .wl-del{
+    background:none;border:none;color:var(--muted);
+    font-size:15px;cursor:pointer;padding:2px 6px;
+  }
+  .empty-state{
+    color:var(--muted);
+    font-size:13px;
+    text-align:center;
+    padding:20px 0;
+  }
+
+  /* Cardio widget */
+  .cardio-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:14px;
+  }
+  .cardio-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .cardio-label{
+    font-size:13.5px;
+    font-weight:600;
+    flex:1;
+  }
+  .cardio-row input{
+    width:64px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--chalk);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    padding:7px 8px;
+    text-align:center;
+  }
+  .cardio-today{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .cardio-today .ct-del{
+    background:none;border:none;color:var(--muted);
+    cursor:pointer;font-size:13px;margin-left:6px;
+  }
+
+  /* Chart legend */
+  .chart-legend{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    margin-top:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+  .chart-legend span{display:flex;align-items:center;gap:5px;}
+  .dot-amber, .dot-green{
+    width:7px;height:7px;border-radius:50%;display:inline-block;
+  }
+  .dot-amber{background:var(--amber);}
+  .dot-green{background:var(--green);}
+
+  /* Macros panel */
+  .macro-hero{
+    text-align:center;
+    padding:18px 0 22px 0;
+    border-bottom:1px solid var(--line);
+    margin-bottom:18px;
+  }
+  .macro-kcal{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:40px;
+    color:var(--amber);
+    line-height:1;
+  }
+  .macro-kcal-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-top:4px;
+  }
+  .macro-grid{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .macro-card{
+    flex:1;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:12px 8px;
+    text-align:center;
+  }
+  .macro-card .mc-val{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:19px;
+  }
+  .macro-card .mc-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-top:2px;
+  }
+  .macro-card .mc-pct{
+    font-size:10.5px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .macro-note{
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.5;
+    margin-bottom:16px;
+  }
+  .macro-edit-toggle{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    border-radius:6px;
+    padding:7px 12px;
+    cursor:pointer;
+  }
+  .macro-edit-form{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:14px;
+  }
+  .macro-edit-form label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:4px;
+  }
+  .macro-edit-form input{
+    width:100%;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--chalk);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:15px;
+    padding:8px;
+    text-align:center;
+  }
+  .macro-edit-form textarea{
+    grid-column:1/-1;
+  }
+  .macro-save-row{
+    grid-column:1/-1;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .status-msg{
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+    margin-top:10px;
+    min-height:14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="eyebrow">Split 6 días · Fuerza hipertrofia</div>
+    <h1>Registro de entreno</h1>
+  </div>
+
+  <div class="view-switch">
+    <button class="view-btn" id="viewWorkoutBtn">Entreno</button>
+    <button class="view-btn" id="viewWeightBtn">Peso</button>
+    <button class="view-btn" id="viewMacrosBtn">Macros</button>
+  </div>
+
+  <div class="plates" id="plates"></div>
+
+  <div class="cardio-box" id="cardioBox"></div>
+
+  <div class="panel" id="panel"></div>
+
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<div class="rest-overlay" id="restOverlay">
+  <div class="rest-time" id="restTime">01:30</div>
+  <div class="rest-label">Descanso — siguiente serie</div>
+  <button class="rest-skip" id="restSkip">Saltar</button>
+</div>
+
+<script>
+const DAYS = [
+  { id:1, name:"Inferior · Cuádriceps/Glúteo", rest:90,
+    exercises:[
+      {n:"Prensa horizontal", target:"4×10-12"},
+      {n:"Hack squat (máquina)", target:"3×10-12"},
+      {n:"Extensión de cuádriceps", target:"3×12-15"},
+      {n:"Máquina glúteo / hip thrust", target:"3×12"},
+      {n:"Abductor máquina", target:"3×15"},
+      {n:"Gemelo en prensa", target:"4×15"},
+    ]},
+  { id:2, name:"Superior · Empuje", rest:75,
+    exercises:[
+      {n:"Press banca / máquina", target:"4×8-10"},
+      {n:"Press militar máquina/mancuernas", target:"3×10"},
+      {n:"Aperturas / cruce poleas", target:"3×12-15"},
+      {n:"Elevaciones laterales", target:"3×15"},
+      {n:"Fondos máquina / tríceps polea", target:"3×12"},
+    ]},
+  { id:3, name:"Inferior · Femoral/Glúteo", rest:90,
+    exercises:[
+      {n:"Curl femoral tumbado/sentado", target:"4×12"},
+      {n:"Peso muerto rumano Smith / hip thrust", target:"4×10"},
+      {n:"Aductor máquina", target:"3×15"},
+      {n:"Prensa pie alto", target:"3×12"},
+      {n:"Gemelo de pie", target:"4×15"},
+    ]},
+  { id:4, name:"Superior · Tracción", rest:75,
+    exercises:[
+      {n:"Jalón al pecho", target:"4×10-12"},
+      {n:"Remo máquina / polea baja", target:"4×10"},
+      {n:"Remo a una mano máquina", target:"3×12"},
+      {n:"Curl bíceps polea/mancuerna", target:"3×12"},
+      {n:"Face pull", target:"3×15"},
+    ]},
+  { id:5, name:"Inferior · Mixto + Core", rest:90,
+    exercises:[
+      {n:"Prensa vertical / Smith pies altos", target:"4×10"},
+      {n:"Extensión + curl femoral (superserie)", target:"3×15"},
+      {n:"Hip thrust máquina", target:"3×12"},
+      {n:"Plancha / rueda / máquina abdomen", target:"3×15"},
+      {n:"Gemelo sentado", target:"4×15"},
+    ]},
+  { id:6, name:"Superior · Full", rest:75,
+    exercises:[
+      {n:"Press inclinado máquina", target:"3×10"},
+      {n:"Elevación lateral polea", target:"3×15"},
+      {n:"Remo alto / pájaro máquina", target:"3×12"},
+      {n:"Curl + tríceps (superserie)", target:"3×12"},
+      {n:"Abdomen (máquina/rueda)", target:"3×15"},
+    ]},
+];
+
+let currentView = 'workout'; // 'workout' | 'weight' | 'macros'
+let weightLog = []; // [{date, kg}]
+let cardioLog = []; // [{date, minutes}]
+let allStrengthDates = []; // ISO date strings, one per finished strength session (any day)
+let macroTarget = { kcal:1650, protein:125, fat:53, carbs:168, note:"Déficit moderado para definir preservando músculo. Proteína fija; ajustar carbohidratos según rendimiento y evolución del peso." };
+let macroEditing = false;
+let currentDay = 1;
+let sessionActive = false;
+let sessionStart = null;
+let liveTimerInterval = null;
+let restInterval = null;
+let state = {}; // in-memory working state per day: {sets:[[{w,r,done}]], notes:""}
+let loggedDays = new Set();
+
+function keyFor(dayId){ return `day${dayId}-data`; }
+
+function defaultSetsFor(day){
+  return day.exercises.map(ex=>{
+    const n = parseInt(ex.target.split('×')[0]) || 3;
+    return Array.from({length:n}, ()=>({w:"",r:"",done:false}));
+  });
+}
+
+async function loadDay(dayId){
+  const day = DAYS.find(d=>d.id===dayId);
+  try{
+    const res = await window.storage.get(keyFor(dayId), false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      state[dayId] = {
+        sets: parsed.lastSets || defaultSetsFor(day),
+        notes: "",
+        history: parsed.history || [],
+        active: false,
+        startedAt: null
+      };
+      if(parsed.history && parsed.history.length>0) loggedDays.add(dayId);
+    } else {
+      state[dayId] = { sets: defaultSetsFor(day), notes:"", history:[], active:false, startedAt:null };
+    }
+  }catch(e){
+    state[dayId] = { sets: defaultSetsFor(day), notes:"", history:[], active:false, startedAt:null };
+  }
+}
+
+async function saveDay(dayId){
+  const day = DAYS.find(d=>d.id===dayId);
+  const s = state[dayId];
+  try{
+    const res = await window.storage.get(keyFor(dayId), false).catch(()=>null);
+    let prevHistory = [];
+    if(res && res.value){
+      try{ prevHistory = JSON.parse(res.value).history || []; }catch(e){}
+    }
+    const payload = { lastSets: s.sets, history: prevHistory };
+    const result = await window.storage.set(keyFor(dayId), JSON.stringify(payload), false);
+    if(!result){ showStatus("No se pudo guardar. Inténtalo de nuevo."); }
+  }catch(e){ showStatus("No se pudo guardar. Inténtalo de nuevo."); }
+}
+
+async function finishSession(dayId){
+  const day = DAYS.find(d=>d.id===dayId);
+  const s = state[dayId];
+  const durationMin = s.startedAt ? Math.round((Date.now()-s.startedAt)/60000) : null;
+  const entry = {
+    date: new Date().toISOString(),
+    durationMin,
+    sets: s.sets,
+    notes: s.notes
+  };
+  try{
+    const res = await window.storage.get(keyFor(dayId), false).catch(()=>null);
+    let history = [];
+    if(res && res.value){
+      try{ history = JSON.parse(res.value).history || []; }catch(e){}
+    }
+    history.push(entry);
+    const payload = { lastSets: s.sets, history };
+    await window.storage.set(keyFor(dayId), JSON.stringify(payload), false);
+    loggedDays.add(dayId);
+    allStrengthDates.push(entry.date);
+    showStatus("Entreno guardado.");
+  }catch(e){
+    showStatus("No se pudo guardar el entreno.");
+  }
+}
+
+function showStatus(msg){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  setTimeout(()=>{ if(el.textContent===msg) el.textContent=""; }, 3000);
+}
+
+function fmtTime(ms){
+  const totalSec = Math.floor(ms/1000);
+  const m = Math.floor(totalSec/60).toString().padStart(2,'0');
+  const s = (totalSec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+async function loadCardioLog(){
+  try{
+    const res = await window.storage.get('cardio-log', false);
+    if(res && res.value){
+      cardioLog = JSON.parse(res.value);
+    }
+  }catch(e){ cardioLog = []; }
+}
+
+async function saveCardioLog(){
+  try{
+    const result = await window.storage.set('cardio-log', JSON.stringify(cardioLog), false);
+    if(!result) showStatus("No se pudo guardar el ciclo.");
+  }catch(e){ showStatus("No se pudo guardar el ciclo."); }
+}
+
+function renderCardioBox(){
+  const box = document.getElementById('cardioBox');
+  if(!box) return;
+  if(currentView!=='workout'){ box.style.display='none'; return; }
+  box.style.display = 'block';
+
+  const todayKey = new Date().toDateString();
+  const todayEntries = cardioLog.filter(c=> new Date(c.date).toDateString()===todayKey);
+
+  let html = `<div class="cardio-row">
+    <span class="cardio-label">🚴 Ciclo indoor</span>
+    <input type="number" id="cardioMinutes" inputmode="numeric" placeholder="min">
+    <button class="btn btn-ghost" id="cardioSaveBtn">Registrar</button>
+  </div>`;
+
+  if(todayEntries.length>0){
+    html += `<div class="cardio-today">Hoy: ` + todayEntries.map(c=>
+      `${c.minutes} min <button class="ct-del" data-date="${c.date}">✕</button>`
+    ).join(' · ') + `</div>`;
+  }
+
+  box.innerHTML = html;
+
+  document.getElementById('cardioSaveBtn').onclick = async ()=>{
+    const input = document.getElementById('cardioMinutes');
+    const val = parseInt(input.value);
+    if(!val || val<=0){ showStatus("Introduce una duración válida."); return; }
+    cardioLog.push({ date: new Date().toISOString(), minutes: val });
+    await saveCardioLog();
+    renderCardioBox();
+    if(currentView==='weight') renderWeightPanel();
+    showStatus("Ciclo registrado.");
+  };
+
+  box.querySelectorAll('.ct-del').forEach(btn=>{
+    btn.onclick = async (e)=>{
+      const date = e.target.dataset.date;
+      cardioLog = cardioLog.filter(c=>c.date!==date);
+      await saveCardioLog();
+      renderCardioBox();
+    };
+  });
+}
+
+async function loadMacroTarget(){
+  try{
+    const res = await window.storage.get('macro-target', false);
+    if(res && res.value){
+      macroTarget = JSON.parse(res.value);
+    }
+  }catch(e){ /* keep defaults */ }
+}
+
+async function saveMacroTarget(){
+  try{
+    const result = await window.storage.set('macro-target', JSON.stringify(macroTarget), false);
+    if(!result) showStatus("No se pudo guardar.");
+  }catch(e){ showStatus("No se pudo guardar."); }
+}
+
+function renderMacrosPanel(){
+  const panel = document.getElementById('panel');
+  const m = macroTarget;
+  const pKcal = m.protein*4, fKcal = m.fat*9, cKcal = m.carbs*4;
+  const pct = (v)=> m.kcal>0 ? Math.round((v/m.kcal)*100) : 0;
+
+  if(macroEditing){
+    panel.innerHTML = `
+      <h2 class="day-title">Macros objetivo</h2>
+      <p class="day-sub">Edita si cambian tus cifras</p>
+      <div class="macro-edit-form">
+        <div><label>Kcal</label><input type="number" id="editKcal" value="${m.kcal}"></div>
+        <div><label>Proteína (g)</label><input type="number" id="editProtein" value="${m.protein}"></div>
+        <div><label>Grasa (g)</label><input type="number" id="editFat" value="${m.fat}"></div>
+        <div><label>Carbohidratos (g)</label><input type="number" id="editCarbs" value="${m.carbs}"></div>
+        <textarea id="editNote" placeholder="Nota">${m.note||''}</textarea>
+        <div class="macro-save-row">
+          <button class="btn btn-start" id="macroSaveBtn">Guardar</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('macroSaveBtn').onclick = async ()=>{
+      macroTarget = {
+        kcal: parseInt(document.getElementById('editKcal').value)||m.kcal,
+        protein: parseInt(document.getElementById('editProtein').value)||m.protein,
+        fat: parseInt(document.getElementById('editFat').value)||m.fat,
+        carbs: parseInt(document.getElementById('editCarbs').value)||m.carbs,
+        note: document.getElementById('editNote').value.trim()
+      };
+      macroEditing = false;
+      await saveMacroTarget();
+      renderMacrosPanel();
+      showStatus("Macros actualizados.");
+    };
+    return;
+  }
+
+  panel.innerHTML = `
+    <h2 class="day-title">Macros objetivo</h2>
+    <p class="day-sub">Referencia diaria mientras defines</p>
+    <div class="macro-hero">
+      <div class="macro-kcal">${m.kcal}</div>
+      <div class="macro-kcal-label">Kcal / día</div>
+    </div>
+    <div class="macro-grid">
+      <div class="macro-card">
+        <div class="mc-val">${m.protein}g</div>
+        <div class="mc-label">Proteína</div>
+        <div class="mc-pct">${pct(pKcal)}%</div>
+      </div>
+      <div class="macro-card">
+        <div class="mc-val">${m.fat}g</div>
+        <div class="mc-label">Grasa</div>
+        <div class="mc-pct">${pct(fKcal)}%</div>
+      </div>
+      <div class="macro-card">
+        <div class="mc-val">${m.carbs}g</div>
+        <div class="mc-label">Carbos</div>
+        <div class="mc-pct">${pct(cKcal)}%</div>
+      </div>
+    </div>
+    ${m.note ? `<p class="macro-note">${m.note}</p>` : ''}
+    <button class="macro-edit-toggle" id="macroEditBtn">Editar</button>
+  `;
+  document.getElementById('macroEditBtn').onclick = ()=>{
+    macroEditing = true;
+    renderMacrosPanel();
+  };
+}
+
+async function loadWeightLog(){
+  try{
+    const res = await window.storage.get('body-weight-log', false);
+    if(res && res.value){
+      weightLog = JSON.parse(res.value);
+    }
+  }catch(e){ weightLog = []; }
+}
+
+async function saveWeightLog(){
+  try{
+    const result = await window.storage.set('body-weight-log', JSON.stringify(weightLog), false);
+    if(!result) showStatus("No se pudo guardar el peso.");
+  }catch(e){ showStatus("No se pudo guardar el peso."); }
+}
+
+function switchView(view){
+  currentView = view;
+  document.getElementById('viewWorkoutBtn').classList.toggle('active', view==='workout');
+  document.getElementById('viewWeightBtn').classList.toggle('active', view==='weight');
+  document.getElementById('viewMacrosBtn').classList.toggle('active', view==='macros');
+  document.getElementById('plates').style.display = view==='workout' ? 'flex' : 'none';
+  if(view==='workout'){
+    renderPlates();
+    renderPanel();
+    renderCardioBox();
+  } else if(view==='weight'){
+    document.getElementById('cardioBox').style.display = 'none';
+    renderWeightPanel();
+  } else {
+    document.getElementById('cardioBox').style.display = 'none';
+    macroEditing = false;
+    renderMacrosPanel();
+  }
+}
+
+function drawWeightChart(entries){
+  if(entries.length < 2){
+    return `<div class="empty-state">Registra al menos 2 pesajes para ver la evolución.</div>`;
+  }
+  const w = 580, h = 160, pad = 24, bottomPad = 40;
+  const dateTimes = entries.map(e=> new Date(e.date).getTime());
+  const trainTimes = allStrengthDates.map(d=> new Date(d).getTime());
+  const cardioTimes = cardioLog.map(c=> new Date(c.date).getTime());
+  const allTimes = dateTimes.concat(trainTimes, cardioTimes);
+  const minD = Math.min(...allTimes);
+  const maxD = Math.max(...allTimes);
+  const spanD = (maxD-minD) || 1;
+
+  const kgs = entries.map(e=>e.kg);
+  const min = Math.min(...kgs), max = Math.max(...kgs);
+  const range = (max-min) || 1;
+
+  const xFor = (t)=> pad + ((t-minD)/spanD)*(w-pad*2);
+  const yFor = (kg)=> (h-bottomPad) - ((kg-min)/range)*(h-bottomPad-pad);
+
+  const points = entries.map(e=> `${xFor(new Date(e.date).getTime()).toFixed(1)},${yFor(e.kg).toFixed(1)}`).join(' ');
+
+  const lastIdx = entries.length-1;
+  const lastX = xFor(dateTimes[lastIdx]);
+  const lastY = yFor(kgs[lastIdx]);
+
+  // group markers by calendar day to avoid duplicate overlapping dots
+  const strengthDayKeys = [...new Set(allStrengthDates.map(d=> new Date(d).toDateString()))];
+  const cardioDayKeys = [...new Set(cardioLog.map(c=> new Date(c.date).toDateString()))];
+
+  let markers = '';
+  strengthDayKeys.forEach(dayKey=>{
+    const x = xFor(new Date(dayKey).getTime());
+    markers += `<circle cx="${x.toFixed(1)}" cy="${(h-bottomPad+12).toFixed(1)}" r="3" fill="#e3a730"/>`;
+  });
+  cardioDayKeys.forEach(dayKey=>{
+    const x = xFor(new Date(dayKey).getTime());
+    markers += `<circle cx="${x.toFixed(1)}" cy="${(h-bottomPad+20).toFixed(1)}" r="3" fill="#7c9a6f"/>`;
+  });
+
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;overflow:visible;">
+    <polyline points="${points}" fill="none" stroke="#e3a730" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${lastX}" cy="${lastY}" r="4" fill="#e3a730"/>
+    ${markers}
+    <text x="${pad}" y="${h-6}" fill="#96908a" font-size="10" font-family="IBM Plex Mono, monospace">${new Date(minD).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})}</text>
+    <text x="${w-pad}" y="${h-6}" fill="#96908a" font-size="10" font-family="IBM Plex Mono, monospace" text-anchor="end">${new Date(maxD).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})}</text>
+  </svg>
+  <div class="chart-legend">
+    <span><i class="dot-amber"></i>Fuerza</span>
+    <span><i class="dot-green"></i>Ciclo</span>
+  </div>`;
+}
+
+function renderWeightPanel(){
+  const panel = document.getElementById('panel');
+  const sorted = [...weightLog].sort((a,b)=> new Date(a.date)-new Date(b.date));
+  const last = sorted[sorted.length-1];
+  const first = sorted[0];
+  const diff = (last && first && sorted.length>1) ? (last.kg - first.kg) : null;
+
+  let html = `
+    <h2 class="day-title">Peso corporal</h2>
+    <p class="day-sub">Registra tu peso para ver la tendencia</p>
+    <div class="weight-form">
+      <input type="number" id="weightInput" inputmode="decimal" step="0.1" placeholder="0.0">
+      <span class="unit">kg</span>
+      <input type="text" id="weightNoteInput" placeholder="Comentario (opcional)">
+      <button class="btn btn-start" id="saveWeightBtn">Guardar</button>
+    </div>
+  `;
+
+  if(sorted.length>0){
+    html += `<div class="weight-stats">
+      <div class="wstat">
+        <div class="wstat-label">Último</div>
+        <div class="wstat-value">${last.kg} kg</div>
+      </div>
+      ${diff!==null ? `
+      <div class="wstat">
+        <div class="wstat-label">Desde el 1º registro</div>
+        <div class="wstat-value ${diff>0?'pos':diff<0?'neg':''}">${diff>0?'+':''}${diff.toFixed(1)} kg</div>
+      </div>` : ''}
+    </div>`;
+  }
+
+  html += `<div class="chart-wrap">${drawWeightChart(sorted)}</div>`;
+
+  html += `<div class="weight-log">`;
+  if(sorted.length===0){
+    html += `<div class="empty-state">Sin pesajes registrados todavía.</div>`;
+  } else {
+    [...sorted].reverse().forEach(entry=>{
+      html += `<div class="weight-log-row" data-date="${entry.date}">
+        <div class="wl-main">
+          <span class="wl-date">${new Date(entry.date).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})}</span>
+          <span class="wl-kg">${entry.kg} kg</span>
+          <span class="wl-actions">
+            <button class="wl-del wl-edit-btn" data-date="${entry.date}">✎</button>
+            <button class="wl-del wl-del-btn" data-date="${entry.date}">✕</button>
+          </span>
+        </div>
+        ${entry.notes ? `<div class="wl-note">${entry.notes}</div>` : ''}
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  panel.innerHTML = html;
+
+  document.getElementById('saveWeightBtn').onclick = async ()=>{
+    const input = document.getElementById('weightInput');
+    const noteInput = document.getElementById('weightNoteInput');
+    const val = parseFloat(input.value);
+    if(!val || val<=0){ showStatus("Introduce un peso válido."); return; }
+    weightLog.push({ date: new Date().toISOString(), kg: val, notes: noteInput.value.trim() });
+    await saveWeightLog();
+    renderWeightPanel();
+    showStatus("Peso guardado.");
+  };
+
+  document.querySelectorAll('.wl-del-btn').forEach(btn=>{
+    btn.onclick = async (e)=>{
+      const date = e.target.dataset.date;
+      weightLog = weightLog.filter(en=>en.date!==date);
+      await saveWeightLog();
+      renderWeightPanel();
+    };
+  });
+
+  document.querySelectorAll('.wl-edit-btn').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const date = e.target.dataset.date;
+      const row = e.target.closest('.weight-log-row');
+      const entry = weightLog.find(en=>en.date===date);
+      if(!entry) return;
+      row.innerHTML = `
+        <div class="wl-edit-form">
+          <input type="number" inputmode="decimal" step="0.1" class="edit-kg" value="${entry.kg}">
+          <input type="text" class="edit-note" value="${entry.notes||''}" placeholder="Comentario">
+          <button class="wl-save edit-save-btn" data-date="${date}">Guardar</button>
+        </div>
+      `;
+      row.querySelector('.edit-save-btn').onclick = async ()=>{
+        const newKg = parseFloat(row.querySelector('.edit-kg').value);
+        const newNote = row.querySelector('.edit-note').value.trim();
+        if(!newKg || newKg<=0){ showStatus("Introduce un peso válido."); return; }
+        entry.kg = newKg;
+        entry.notes = newNote;
+        await saveWeightLog();
+        renderWeightPanel();
+        showStatus("Registro actualizado.");
+      };
+    };
+  });
+}
+
+function renderPlates(){
+  const cont = document.getElementById('plates');
+  cont.innerHTML = "";
+  DAYS.forEach(d=>{
+    const el = document.createElement('div');
+    el.className = 'plate' + (d.id===currentDay?' active':'') + (loggedDays.has(d.id)?' logged':'');
+    el.innerHTML = `D${d.id}<div class="dot"></div>`;
+    el.onclick = ()=> switchDay(d.id);
+    cont.appendChild(el);
+  });
+}
+
+async function switchDay(dayId){
+  if(sessionActive && dayId!==currentDay){
+    showStatus("Termina el entreno actual antes de cambiar de día.");
+    return;
+  }
+  currentDay = dayId;
+  if(!state[dayId]) await loadDay(dayId);
+  renderPlates();
+  renderPanel();
+}
+
+function renderPanel(){
+  const day = DAYS.find(d=>d.id===currentDay);
+  const s = state[currentDay];
+  const panel = document.getElementById('panel');
+
+  let html = `
+    <h2 class="day-title">Día ${day.id} — ${day.name}</h2>
+    <p class="day-sub">Descanso sugerido entre series: ${day.rest}s</p>
+    <div class="session-bar">
+      ${s.active
+        ? `<button class="btn btn-end" id="endBtn">Terminar entreno</button><span class="timer-live" id="liveTimer">00:00</span>`
+        : `<button class="btn btn-start" id="startBtn">Iniciar entreno</button><span class="timer-idle">${s.history.length} sesiones registradas</span>`
+      }
+    </div>
+  `;
+
+  day.exercises.forEach((ex, exIdx)=>{
+    html += `<div class="exercise" data-ex="${exIdx}">
+      <div class="ex-head">
+        <span class="ex-name">${ex.n}</span>
+        <span class="ex-target">${ex.target}</span>
+      </div>
+      <table class="sets-table">
+        <tr><th></th><th>Kg</th><th>Reps</th><th></th></tr>
+        ${s.sets[exIdx].map((set,setIdx)=>`
+          <tr data-set="${setIdx}">
+            <td>${setIdx+1}</td>
+            <td><input type="number" inputmode="decimal" class="w-input" value="${set.w}" ${s.active?'':'disabled'}></td>
+            <td><input type="number" inputmode="numeric" class="r-input" value="${set.r}" ${s.active?'':'disabled'}></td>
+            <td><button class="set-check ${set.done?'done':''}" ${s.active?'':'disabled'}>${set.done?'✓':''}</button></td>
+          </tr>
+        `).join('')}
+      </table>
+      <button class="add-set" data-ex="${exIdx}" ${s.active?'':'disabled'}>+ serie</button>
+    </div>`;
+  });
+
+  html += `<div class="notes-block">
+    <span class="notes-label">Notas del día</span>
+    <textarea id="notesArea" placeholder="Sensaciones, ajustes, molestias..." ${s.active?'':'disabled'}>${s.notes}</textarea>
+  </div>`;
+
+  html += `<div class="history-note">${s.history.length>0 ? 'Última sesión: '+new Date(s.history[s.history.length-1].date).toLocaleDateString('es-ES') : 'Sin sesiones previas'}</div>`;
+
+  panel.innerHTML = html;
+  attachPanelEvents(day);
+}
+
+function attachPanelEvents(day){
+  const s = state[currentDay];
+
+  const startBtn = document.getElementById('startBtn');
+  if(startBtn) startBtn.onclick = ()=>{
+    s.active = true;
+    s.startedAt = Date.now();
+    sessionActive = true;
+    renderPanel();
+    liveTimerInterval = setInterval(()=>{
+      const el = document.getElementById('liveTimer');
+      if(el) el.textContent = fmtTime(Date.now()-s.startedAt);
+    }, 1000);
+  };
+
+  const endBtn = document.getElementById('endBtn');
+  if(endBtn) endBtn.onclick = async ()=>{
+    clearInterval(liveTimerInterval);
+    s.active = false;
+    sessionActive = false;
+    await finishSession(currentDay);
+    renderPlates();
+    renderPanel();
+  };
+
+  document.querySelectorAll('.w-input').forEach(inp=>{
+    inp.oninput = (e)=>{
+      const exIdx = parseInt(e.target.closest('.exercise').dataset.ex);
+      const setIdx = parseInt(e.target.closest('tr').dataset.set);
+      s.sets[exIdx][setIdx].w = e.target.value;
+      saveDay(currentDay);
+    };
+  });
+  document.querySelectorAll('.r-input').forEach(inp=>{
+    inp.oninput = (e)=>{
+      const exIdx = parseInt(e.target.closest('.exercise').dataset.ex);
+      const setIdx = parseInt(e.target.closest('tr').dataset.set);
+      s.sets[exIdx][setIdx].r = e.target.value;
+      saveDay(currentDay);
+    };
+  });
+  document.querySelectorAll('.set-check').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const exIdx = parseInt(e.target.closest('.exercise').dataset.ex);
+      const setIdx = parseInt(e.target.closest('tr').dataset.set);
+      const set = s.sets[exIdx][setIdx];
+      set.done = !set.done;
+      saveDay(currentDay);
+      renderPanel();
+      if(set.done) startRestTimer(day.rest);
+    };
+  });
+  document.querySelectorAll('.add-set').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const exIdx = parseInt(e.target.dataset.ex);
+      s.sets[exIdx].push({w:"",r:"",done:false});
+      saveDay(currentDay);
+      renderPanel();
+    };
+  });
+  const notesArea = document.getElementById('notesArea');
+  if(notesArea) notesArea.oninput = (e)=>{ s.notes = e.target.value; };
+}
+
+function startRestTimer(seconds){
+  clearInterval(restInterval);
+  let remaining = seconds;
+  const overlay = document.getElementById('restOverlay');
+  const timeEl = document.getElementById('restTime');
+  overlay.classList.add('show');
+  timeEl.textContent = fmtTime(remaining*1000);
+  restInterval = setInterval(()=>{
+    remaining--;
+    if(remaining<=0){
+      clearInterval(restInterval);
+      overlay.classList.remove('show');
+      return;
+    }
+    timeEl.textContent = fmtTime(remaining*1000);
+  }, 1000);
+}
+
+document.getElementById('restSkip').onclick = ()=>{
+  clearInterval(restInterval);
+  document.getElementById('restOverlay').classList.remove('show');
+};
+
+document.getElementById('viewWorkoutBtn').onclick = ()=> switchView('workout');
+document.getElementById('viewWeightBtn').onclick = ()=> switchView('weight');
+document.getElementById('viewMacrosBtn').onclick = ()=> switchView('macros');
+
+(async function init(){
+  await loadDay(currentDay);
+  await loadWeightLog();
+  await loadCardioLog();
+  await loadMacroTarget();
+  for(const d of DAYS){
+    try{
+      const res = await window.storage.get(keyFor(d.id), false);
+      if(res && res.value){
+        const parsed = JSON.parse(res.value);
+        if(parsed.history && parsed.history.length>0){
+          loggedDays.add(d.id);
+          parsed.history.forEach(entry=> allStrengthDates.push(entry.date));
+        }
+      }
+    }catch(e){}
+  }
+  document.getElementById('viewWorkoutBtn').classList.add('active');
+  renderPlates();
+  renderPanel();
+  renderCardioBox();
+})();
+</script>
+</body>
+</html>
